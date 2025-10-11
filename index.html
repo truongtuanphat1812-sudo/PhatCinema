@@ -1,11 +1,291 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-    <h1>Dự án phim cuối khóa</h1>
-</body>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>🎬 Trang xem phim</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@tailwindcss/forms"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"
+      defer
+    ></script>
+  </head>
+  <body
+    class="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-100 font-sans min-h-screen flex flex-col"
+  >
+    <!-- Header -->
+    <header
+      class="sticky top-0 z-40 bg-gray-900/80 backdrop-blur border-b border-gray-800"
+    >
+      <div
+        class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between"
+      >
+        <h1 class="text-lg font-bold flex items-center gap-2">
+          <i class="fa-solid fa-clapperboard"></i> Xem Phim Online
+        </h1>
+        <nav class="hidden md:flex gap-6 text-sm text-gray-300">
+          <a href="#" class="hover:text-teal-400">Trang chủ</a>
+          <a href="#" class="hover:text-teal-400">Thể loại</a>
+          <a href="#" class="hover:text-teal-400">Mới nhất</a>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main content -->
+    <main class="flex-1">
+      <section class="max-w-7xl mx-auto px-4 py-8">
+        <!-- Controls -->
+        <div class="flex flex-col sm:flex-row gap-3 mb-8">
+          <input
+            id="search"
+            class="flex-1 rounded-xl bg-gray-800 border-gray-700 placeholder-gray-500"
+            placeholder="🔍 Tìm phim theo tên..."
+          />
+          <select
+            id="filterYear"
+            class="rounded-xl bg-gray-800 border-gray-700"
+          >
+            <option value="all">Tất cả năm</option>
+          </select>
+          <button
+            id="btnAdd"
+            class="rounded-xl px-4 py-2 bg-teal-500 hover:bg-teal-600 font-semibold"
+          >
+            + Thêm phim
+          </button>
+        </div>
+
+        <!-- Movie Grid -->
+        <div
+          id="moviesGrid"
+          class="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+        ></div>
+
+        <!-- Add Movie Form -->
+        <div
+          class="mt-10 p-6 rounded-2xl bg-gray-800/60 border border-gray-700"
+        >
+          <h2 class="font-semibold mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-plus"></i> Thêm phim mới
+          </h2>
+          <div class="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
+            <input
+              id="newTitle"
+              placeholder="Tiêu đề"
+              class="rounded-lg bg-gray-900 border-gray-700 px-3 py-2"
+            />
+            <input
+              id="newYear"
+              placeholder="Năm"
+              class="rounded-lg bg-gray-900 border-gray-700 px-3 py-2"
+            />
+            <input
+              id="newPoster"
+              placeholder="URL poster"
+              class="rounded-lg bg-gray-900 border-gray-700 px-3 py-2"
+            />
+            <input
+              id="newUrl"
+              placeholder="URL video (.mp4)"
+              class="rounded-lg bg-gray-900 border-gray-700 px-3 py-2"
+            />
+          </div>
+          <button
+            id="saveNew"
+            class="mt-3 rounded-lg px-4 py-2 bg-teal-500 hover:bg-teal-600"
+          >
+            Lưu phim
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal Player -->
+    <div
+      id="modal"
+      class="fixed inset-0 hidden items-center justify-center bg-black/80 z-50"
+    >
+      <div
+        class="w-full max-w-4xl mx-4 bg-gray-900 rounded-2xl shadow-xl overflow-hidden animate-fadeIn"
+      >
+        <div
+          class="flex items-center justify-between p-4 border-b border-gray-700"
+        >
+          <div>
+            <h3 id="playerTitle" class="font-bold text-lg"></h3>
+            <p id="playerMeta" class="text-sm text-gray-400"></p>
+          </div>
+          <button id="btnClose" class="text-gray-400 hover:text-white">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <video
+          id="videoPlayer"
+          controls
+          class="w-full bg-black max-h-[70vh]"
+        ></video>
+        <div class="p-4 flex justify-between text-sm text-gray-400">
+          <p id="playerDesc">Mô tả...</p>
+          <button id="btnFull" class="hover:text-teal-400">
+            <i class="fa-solid fa-expand"></i> Toàn màn hình
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer
+      class="text-gray-500 text-sm text-center py-6 border-t border-gray-800"
+    >
+      © 2025 Xem Phim Online. Thiết kế bởi bạn.
+    </footer>
+
+    <script>
+      const movies = [
+        {
+          id: 1,
+          title: "Detective Conan Movie 28: Dư ảnh của độc nhãn",
+          year: 2024,
+          poster:
+            "https://cinema.momocdn.net/img/89520077420501400-conannn.png?size=M",
+          desc: "Conan Movie 28: Dư ảnh của độc nhãn",
+        },
+        {
+          id: 2,
+          title: "Spider-Man: No Way Home",
+          year: 2021,
+          poster:
+            "https://upload.wikimedia.org/wikipedia/en/0/00/Spider-Man_No_Way_Home_poster.jpg",
+          url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          desc: "Spider-Man đối mặt với đa vũ trụ",
+        },
+        {
+          id: 3,
+          title: "John Wick",
+          year: 2014,
+          poster:
+            "https://upload.wikimedia.org/wikipedia/en/9/98/John_Wick_TeaserPoster.jpg",
+          url: "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
+          desc: "Một sát thủ huyền thoại trở lại",
+        },
+      ];
+
+      const grid = document.getElementById("moviesGrid");
+      const modal = document.getElementById("modal");
+      const videoPlayer = document.getElementById("videoPlayer");
+      const playerTitle = document.getElementById("playerTitle");
+      const playerMeta = document.getElementById("playerMeta");
+      const playerDesc = document.getElementById("playerDesc");
+      const filterYear = document.getElementById("filterYear");
+      const search = document.getElementById("search");
+
+      function render(list) {
+        grid.innerHTML = "";
+        if (!list.length) {
+          grid.innerHTML = '<p class="text-gray-400">Không tìm thấy phim.</p>';
+          return;
+        }
+        list.forEach((m) => {
+          const card = document.createElement("div");
+          card.className =
+            "rounded-xl bg-gray-800/70 overflow-hidden border border-gray-700 flex flex-col hover:shadow-lg transition";
+          card.innerHTML = `
+          <div class='aspect-[2/3] overflow-hidden'>
+            <img src='${m.poster}' alt='${m.title}' class='w-full h-full object-cover hover:scale-105 transition'>
+          </div>
+          <div class='p-3 flex flex-col flex-1'>
+            <h4 class='font-semibold'>${m.title}</h4>
+            <p class='text-sm text-gray-400 mb-3'>${m.year}</p>
+            <div class='mt-auto flex gap-2'>
+              <button class='flex-1 bg-teal-500 hover:bg-teal-600 text-black rounded-lg py-1' onclick='openPlayer(${m.id})'>▶ Xem</button>
+              <button class='px-2 border border-gray-600 rounded-lg hover:bg-gray-700' onclick='alert("${m.title}: ${m.desc}")'>ℹ</button>
+            </div>
+          </div>`;
+          grid.appendChild(card);
+        });
+      }
+
+      function openPlayer(id) {
+        const m = movies.find((x) => x.id === id);
+        playerTitle.textContent = m.title;
+        playerMeta.textContent = m.year;
+        playerDesc.textContent = m.desc;
+        videoPlayer.src = m.url;
+        modal.classList.remove("hidden");
+        videoPlayer.play();
+      }
+
+      document.getElementById("btnClose").onclick = () => {
+        modal.classList.add("hidden");
+        videoPlayer.pause();
+      };
+      document.getElementById("btnFull").onclick = () => {
+        videoPlayer.requestFullscreen();
+      };
+      window.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") modal.classList.add("hidden");
+      });
+
+      function populateYears() {
+        const years = [...new Set(movies.map((m) => m.year))].sort(
+          (a, b) => b - a
+        );
+        years.forEach((y) => {
+          const opt = document.createElement("option");
+          opt.value = y;
+          opt.textContent = y;
+          filterYear.appendChild(opt);
+        });
+      }
+
+      function applyFilters() {
+        const q = search.value.toLowerCase();
+        const y = filterYear.value;
+        render(
+          movies.filter(
+            (m) =>
+              m.title.toLowerCase().includes(q) &&
+              (y === "all" || String(m.year) === y)
+          )
+        );
+      }
+
+      document.getElementById("saveNew").onclick = () => {
+        const title = document.getElementById("newTitle").value.trim();
+        const year = document.getElementById("newYear").value.trim();
+        const poster =
+          document.getElementById("newPoster").value.trim() ||
+          "https://via.placeholder.com/400x600?text=Poster";
+        const url = document.getElementById("newUrl").value.trim();
+        if (!title || !url) return alert("Cần tiêu đề và URL video");
+        const id = Math.max(0, ...movies.map((m) => m.id)) + 1;
+        movies.push({ id, title, year, poster, url, desc: "Tự thêm" });
+        applyFilters();
+      };
+
+      search.oninput = applyFilters;
+      filterYear.onchange = applyFilters;
+
+      populateYears();
+      render(movies);
+    </script>
+
+    <style>
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+      .animate-fadeIn {
+        animation: fadeIn 0.25s ease-out;
+      }
+    </style>
+  </body>
 </html>
+  
